@@ -1,0 +1,44 @@
+{
+  "id": "0aa36fa0-59be-4c9d-addf-d585482e02f3",
+  "name": "Workshop_optimize",
+  "description": null,
+  "default_flow": "Default",
+  "flows": [
+    {
+      "name": "Default",
+      "description": "Default custom flow",
+      "commands": []
+    }
+  ],
+  "files": [],
+  "functions": [],
+  "apps": [
+    {
+      "name": "google/analytics",
+      "description": "This function allows you simulate a page view and/or send events to Google Analytics in order to better analyse your users behaviour.",
+      "args": [
+        "method=\"newPageView|sendEvent\"",
+        "params=\"\""
+      ],
+      "runtime": "nodejs12.x",
+      "handler": "index.handler",
+      "environment": {
+        "GA_ID": ""
+      },
+      "app_id": "52646cda-3486-40df-8d70-8b16136031c3",
+      "version": "1.1.0"
+    },
+    {
+      "name": "utils/uuid",
+      "description": "Generate random UUIDs (either v1 or v4 - defaults to v4)",
+      "args": [
+        "version=\"v1|v4\""
+      ],
+      "runtime": "nodejs12.x",
+      "handler": "index.handler",
+      "environment": {},
+      "app_id": "c8fc0a19-1dcf-4859-8fe3-ce49113567e3",
+      "version": "1.0.0"
+    }
+  ]
+}

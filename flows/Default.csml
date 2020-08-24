@@ -1,0 +1,57 @@
+start:
+  say "Hi, let me help you register to our awesome event!"
+  goto name
+
+name:
+  // Asking a question
+  say "What's your name?"
+  // Waiting for the user's input
+  hold
+  // We remember what the user said
+  remember name = event
+  // We go to the next step
+  goto email
+
+email:
+  say "What's your email address?"
+  hold
+  if (!event.contains("@")) {
+    say "Please enter a valid email address"
+    goto email
+  }
+  remember email = event
+  if (OneOf([0,1]) == 0) goto confirm
+  else goto confirm2
+
+confirm:
+  say Question("Can you confirm you accept that one of our sales team member contacts you?",
+    button_type="quick_reply",
+    buttons=[
+      Button("Yes") as btnyes,
+      Button("No") as btnno
+  ])
+  hold
+  if (event match btnno) say "Ok no problem!"
+  remember optin = event
+  goto save
+
+confirm2:
+  say Question("Is it ok if we contcat you in the future? 😇😇😇",
+    button_type="quick_reply",
+    buttons=[
+      Button("Yes") as btnyes,
+      Button("No") as btnno
+  ])
+  hold
+  if (event match btnno) say "Ok no problem!"
+  remember optin = event
+  goto save
+
+save:
+  say "Ok **{{name}}**, I have registered your email **{{email}}** to our event!"
+  say "Enjoy the great content 🎉"
+  do Fn("zapier", hook="myhook/myhookid", payload={
+      "name": name,
+      "email": email,
+      "optin": optin})
+  goto end
