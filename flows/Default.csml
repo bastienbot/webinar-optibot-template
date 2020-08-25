@@ -1,5 +1,19 @@
 start:
-  say "Hi, let me help you register to our awesome event!"
+  if (hasRegistered) {
+    say "Actually I don't need you to register again, you cn visit our website!"
+    say Url("https://csml.dev")
+    goto end
+  } else if (email) goto confirm2
+  else if (name) goto email
+  
+  if (!user_id) remember user_id = Fn("utils/uuid", version="v4")
+  say "Hi {{_metadata.firstname}}, let me help you register to our awesome event 🎉!"
+  do Fn("google/analytics", 
+  method="sendEvent", 
+  params={"user_id": user_id,
+  "category": "csml_event_chatbot",
+  "action": "flow_process",
+  "label": "start"})
   goto name
 
 name:
@@ -10,6 +24,12 @@ name:
   // We remember what the user said
   remember name = event
   // We go to the next step
+  do Fn("google/analytics", 
+  method="sendEvent", 
+  params={"user_id": user_id,
+  "category": "csml_event_chatbot",
+  "action": "flow_process",
+  "label": "name"})
   goto email
 
 email:
@@ -20,23 +40,16 @@ email:
     goto email
   }
   remember email = event
-  if (OneOf([0,1]) == 0) goto confirm
-  else goto confirm2
-
-confirm:
-  say Question("Can you confirm you accept that one of our sales team member contacts you?",
-    button_type="quick_reply",
-    buttons=[
-      Button("Yes") as btnyes,
-      Button("No") as btnno
-  ])
-  hold
-  if (event match btnno) say "Ok no problem!"
-  remember optin = event
-  goto save
+  do Fn("google/analytics", 
+  method="sendEvent", 
+  params={"user_id": user_id,
+  "category": "csml_event_chatbot",
+  "action": "flow_process",
+  "label": "email"})
+  goto confirm2
 
 confirm2:
-  say Question("Is it ok if we contcat you in the future? 😇😇😇",
+  say Question("Is it ok if we contact you in the future? 😇😇😇",
     button_type="quick_reply",
     buttons=[
       Button("Yes") as btnyes,
@@ -45,13 +58,26 @@ confirm2:
   hold
   if (event match btnno) say "Ok no problem!"
   remember optin = event
+  do Fn("google/analytics", 
+  method="sendEvent", 
+  params={"user_id": user_id,
+  "category": "csml_event_chatbot",
+  "action": "flow_process",
+  "label": "optin2"})
   goto save
 
 save:
   say "Ok **{{name}}**, I have registered your email **{{email}}** to our event!"
   say "Enjoy the great content 🎉"
+  do Fn("google/analytics", 
+  method="sendEvent", 
+  params={"user_id": user_id,
+  "category": "csml_event_chatbot",
+  "action": "flow_process",
+  "label": "end"})
   do Fn("zapier", hook="myhook/myhookid", payload={
       "name": name,
       "email": email,
       "optin": optin})
+  remember hasRegistered = true
   goto end
